@@ -1,69 +1,270 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#111e2d">
-  <meta name="description" content="白ひげの艦長の腕をスティックで動かして、腹痛のfpandaさんを救おう！60秒のやさしいおなか救助ゲーム。">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="助けろ艦長！腹痛のfpandaさんを救え！">
-  <meta property="og:description" content="スティックで艦長の腕を操作して、おなかをさすれ！">
-  <meta property="og:image" content="assets/captain-no-hand.webp">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <title>助けろ艦長！腹痛のfpandaさんを救え！</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="game.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101a27">
+<title>助けろ艦長！腹痛のfpandaさんを救え！</title>
+<style>
+:root{--bg:#101a27;--panel:#182636;--panel2:#22374d;--text:#eef3f7;--muted:#aec0cf;--gold:#e2c38b;--danger:#e47070;--ok:#79d9b0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(circle at top,#21334a,#0b121b 60%);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none}
+body{min-height:100svh}
+button{font:inherit}
+.app{min-height:100svh;display:flex;flex-direction:column;gap:10px;padding:10px max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));max-width:980px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.title{font-weight:900;font-size:clamp(18px,4vw,28px);letter-spacing:.03em;line-height:1.15;margin:0}
+.best{font-weight:800;color:var(--gold);font-size:14px;white-space:nowrap}
+.hud{display:grid;grid-template-columns:minmax(0,1fr) 90px 110px;gap:8px}
+.card{background:linear-gradient(180deg,#223449,#172432);border:1px solid #ffffff1c;border-radius:16px;padding:10px 12px;box-shadow:0 10px 22px #00000026}
+.painhead{display:flex;justify-content:space-between;align-items:end;gap:8px;font-size:12px;font-weight:800;color:#dce7ee}
+.painvalue{font-size:clamp(18px,4vw,28px);line-height:1;color:#fff4d2}
+.track{margin-top:8px;height:12px;border-radius:999px;background:#08121b;overflow:hidden;border:1px solid #ffffff12}
+.fill{height:100%;width:100%;background:linear-gradient(90deg,#79d9b0 0%,#f0bf72 50%,#e47070 100%);transform-origin:left center}
+.minicard{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.minicard .label{font-size:11px;color:var(--muted);font-weight:700}
+.minicard .value{font-size:clamp(22px,5vw,30px);font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+.stage-wrap{position:relative;flex:1;display:flex;align-items:center;justify-content:center}
+.stage{position:relative;width:min(100%,820px);aspect-ratio:4/3;border-radius:18px;overflow:hidden;background:#0b1118;box-shadow:0 18px 40px #0008;touch-action:none;user-select:none;border:1px solid #ffffff24}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.warmth{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .15s;background:radial-gradient(circle at var(--warm-x,58%) var(--warm-y,60%),rgba(255,214,145,.34),rgba(255,214,145,.16) 12%,rgba(255,214,145,0) 28%)}
+.arm{position:absolute;left:var(--arm-x,-15%);top:var(--arm-y,52%);width:74.6%;height:auto;transform:translate(0,-50%);transform-origin:16% 50%;pointer-events:auto;touch-action:none;user-select:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.18));cursor:grab}
+.arm.dragging{cursor:grabbing;filter:drop-shadow(0 10px 18px rgba(0,0,0,.32))}
+.flash{position:absolute;left:var(--flash-x,60%);top:var(--flash-y,60%);width:26px;height:26px;border-radius:50%;pointer-events:none;opacity:0;transform:translate(-50%,-50%) scale(.4);background:radial-gradient(circle,#fff4d6 0%,#ffe199 35%,rgba(255,225,153,0) 72%)}
+.flash.on{animation:pop .26s ease-out}
+@keyframes pop{0%{opacity:.9;transform:translate(-50%,-50%) scale(.35)}100%{opacity:0;transform:translate(-50%,-50%) scale(2.2)}}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,8,14,.62);backdrop-filter:blur(6px);padding:18px;z-index:20}
+.panel{width:min(100%,420px);background:linear-gradient(180deg,#25384d,#182536);border:1px solid #ffffff24;border-radius:22px;padding:22px;text-align:center;box-shadow:0 24px 70px #0009}
+.panel h2{margin:0 0 12px;font-size:clamp(24px,6vw,36px);line-height:1.2}
+.panel p{margin:0 0 16px;color:#d5e0e8;font-weight:700}
+.result{margin:12px 0 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.result .box{background:#ffffff10;border:1px solid #ffffff15;border-radius:14px;padding:10px}
+.result small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.result strong{font-size:26px;font-weight:900}
+.btn{appearance:none;border:0;border-radius:14px;padding:15px 18px;background:linear-gradient(180deg,#e4c893,#cdaa72);color:#192534;font-weight:900;font-size:17px;box-shadow:0 6px 0 #8d7349;min-width:180px}
+.btn:active{transform:translateY(2px);box-shadow:0 4px 0 #8d7349}
+.hidden{display:none !important}
+@media (max-width:620px){.app{gap:8px;padding-top:8px}.hud{grid-template-columns:minmax(0,1fr) 74px 90px;gap:6px}.card{padding:8px 10px;border-radius:14px}.track{height:10px}.title{font-size:clamp(16px,4.5vw,22px)}.best{font-size:12px}.stage{border-radius:14px}.panel{padding:18px}.result strong{font-size:22px}}
+</style>
 </head>
 <body>
- <main class="game" id="game" aria-label="助けろ艦長！腹痛のfpandaさんを救え！">
-  <header class="masthead">
-   <div class="brandmark" aria-hidden="true">⚓</div>
-   <div class="brandcopy"><p class="eyebrow">CAPTAIN'S BELLY RESCUE</p><h1>助けろ艦長！<span>腹痛のfpandaさんを救え！</span></h1></div>
-   <button class="iconbtn" id="soundButton" type="button" aria-label="効果音をオン・オフ" aria-pressed="true" title="効果音"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M18 5a9 9 0 0 1 0 14"/></svg></button>
-  </header>
-  <section class="hud" aria-label="ゲームの状態">
-   <div class="painpanel">
-    <div class="meterhead"><span><span class="reddot"></span> fpandaさんの腹痛</span><strong id="painNum">72<span>%</span></strong></div>
-    <div class="paintrack" role="progressbar" aria-label="おなかの痛み" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72" id="painTrack"><div class="painfill" id="painFill"></div></div>
-    <div class="meterhint"><span>回復！</span><span>痛い…</span></div>
-   </div>
-   <div class="statbox"><span class="statlabel">のこり</span><div class="statvalue"><span id="timeNum">60</span><small>秒</small></div></div>
-   <div class="statbox scorebox"><span class="statlabel">SCORE</span><div class="statvalue" id="scoreNum">0000</div></div>
-  </section>
-  <section class="playarea">
-   <div class="stageframe" id="stage" aria-label="スティックで艦長の腕を動かして、fpandaさんのおなかをさする">
-    <img class="photo" src="assets/captain-no-hand.webp" alt="白いひげの艦長が腹痛のfpandaさんのおなかに頬を寄せている" draggable="false">
-    <div class="photo-shade" aria-hidden="true"></div>
-    <div class="photo-warmth" id="photoWarmth" aria-hidden="true"></div>
-    <img class="captain-arm" id="captainArm" src="assets/captain-arm.webp" alt="" aria-hidden="true" draggable="false">
-    <canvas id="effects" aria-hidden="true"></canvas>
-    <div class="floatingmessage" id="floatingMessage" aria-live="polite"></div>
-    <div class="speech" id="speech"><span class="speechmark">艦長</span><span id="speechText">fpandaさん、わしが助けるぞ！</span></div>
-    <div class="combo" id="combo" aria-live="off"></div>
-   </div>
-   <div class="controlbar">
-    <div class="joystickblock">
-     <div class="joystick" id="joystick" aria-label="腕を動かすスティック。上下左右にドラッグ" role="application" tabindex="0">
-       <div class="joycircle"><div class="joyinner" id="joyKnob"><span aria-hidden="true">✥</span></div></div>
-     </div>
-     <div class="controlcopy"><strong>腕を動かす</strong><small id="instructionDetail">スティックをぐるぐる動かしてさすろう</small><span class="controlpc">PC：矢印 / WASD / ゲームパッド</span></div>
-    </div>
-    <button class="pausebtn" type="button" id="pauseButton" disabled aria-label="一時停止"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>停止</span></button>
-   </div>
-  </section>
-  <footer class="footer"><span>腕を動かして、腹痛をゼロに。</span><span>BEST <b id="bestNum">0000</b></span></footer>
-  <div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-    <section class="dialog" id="dialog">
-      <div class="dialog-emblem" id="dialogEmblem">⚓</div>
-      <div class="dialog-kicker" id="dialogKicker">CAPTAIN'S SPECIAL MISSION</div>
-      <h2 id="dialogTitle">助けろ艦長！<br>腹痛のfpandaさんを救え！</h2>
-      <p class="dialog-body" id="dialogBody">画面下の <strong>スティック</strong> で艦長の腕を操作！<br>おなかをゆっくり往復させて、腹痛をやわらげよう。</p>
-      <div class="rulechips" id="ruleChips"><span><b>01</b> スティックを動かす</span><span><b>02</b> おなかをやさしく往復</span><span><b>03</b> 60秒以内に回復</span></div>
-      <div class="resultstats" id="resultStats" hidden></div>
-      <button class="startbtn" id="mainButton" type="button">救助をはじめる <span>→</span></button>
-      <p class="dialog-foot" id="dialogFoot">PCでは矢印・WASD・ゲームパッドにも対応！</p>
-    </section>
+<div class="app">
+  <div class="topbar">
+    <h1 class="title">助けろ艦長！腹痛のfpandaさんを救え！</h1>
+    <div class="best">BEST <span id="bestNum">0</span></div>
   </div>
- </main>
+  <div class="hud">
+    <div class="card">
+      <div class="painhead"><span>腹痛レベル</span><span class="painvalue"><span id="painNum">100</span>%</span></div>
+      <div class="track"><div class="fill" id="painFill"></div></div>
+    </div>
+    <div class="card minicard"><span class="label">のこり</span><span class="value"><span id="timeNum">60</span></span></div>
+    <div class="card minicard"><span class="label">SCORE</span><span class="value" id="scoreNum">0</span></div>
+  </div>
+  <div class="stage-wrap">
+    <div class="stage" id="stage">
+      <img class="bg" src="assets/captain-no-hand.webp" alt="白ひげの艦長が腹痛のfpandaさんのおなかに寄り添っている">
+      <div class="warmth" id="warmth"></div>
+      <img class="arm" id="arm" src="assets/captain-arm.webp" alt="" draggable="false">
+      <div class="flash" id="flash"></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <h2 id="overlayTitle">助けろ艦長！<br>腹痛のfpandaさんを救え！</h2>
+    <p id="overlayText"> </p>
+    <div class="result hidden" id="resultRow">
+      <div class="box"><small>SCORE</small><strong id="resultScore">0</strong></div>
+      <div class="box"><small>BEST</small><strong id="resultBest">0</strong></div>
+    </div>
+    <button class="btn" id="mainBtn" type="button">はじめる</button>
+  </div>
+</div>
+<script>
+(() => {
+  const stage = document.getElementById('stage');
+  const arm = document.getElementById('arm');
+  const warmth = document.getElementById('warmth');
+  const flash = document.getElementById('flash');
+  const painNum = document.getElementById('painNum');
+  const painFill = document.getElementById('painFill');
+  const timeNum = document.getElementById('timeNum');
+  const scoreNum = document.getElementById('scoreNum');
+  const bestNum = document.getElementById('bestNum');
+  const overlay = document.getElementById('overlay');
+  const overlayTitle = document.getElementById('overlayTitle');
+  const overlayText = document.getElementById('overlayText');
+  const resultRow = document.getElementById('resultRow');
+  const resultScore = document.getElementById('resultScore');
+  const resultBest = document.getElementById('resultBest');
+  const mainBtn = document.getElementById('mainBtn');
+
+  const GAME_TIME = 60;
+  const defaultPos = {x:-15.2, y:51.6};
+  const bounds = {xMin:-34, xMax:6, yMin:33, yMax:73};
+  const belly = {x:62, y:56, rx:21, ry:21};
+  const handHotspot = {x:.63, y:.56};
+
+  let best = Number(localStorage.getItem('captainBellyBest2') || 0);
+  let running = false;
+  let pain = 100;
+  let score = 0;
+  let timeLeft = GAME_TIME;
+  let timer = null;
+  let drag = null;
+  let armPos = {...defaultPos};
+  let warmthLevel = 0;
+  let lastMoveTS = 0;
+  let lastFlash = 0;
+  bestNum.textContent = best;
+
+  function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  function setArmPos(){
+    arm.style.setProperty('--arm-x', armPos.x + '%');
+    arm.style.setProperty('--arm-y', armPos.y + '%');
+  }
+  function updateHud(){
+    painNum.textContent = Math.max(0, Math.round(pain));
+    painFill.style.transform = `scaleX(${pain/100})`;
+    timeNum.textContent = Math.max(0, Math.ceil(timeLeft));
+    scoreNum.textContent = String(Math.round(score));
+    bestNum.textContent = String(best);
+  }
+  function resetGame(){
+    pain = 100;
+    score = 0;
+    timeLeft = GAME_TIME;
+    warmthLevel = 0;
+    armPos = {...defaultPos};
+    setArmPos();
+    warmth.style.opacity = '0';
+    updateHud();
+  }
+  function startGame(){
+    resetGame();
+    overlay.classList.add('hidden');
+    resultRow.classList.add('hidden');
+    running = true;
+    const start = performance.now();
+    clearInterval(timer);
+    timer = setInterval(() => {
+      const elapsed = (performance.now() - start) / 1000;
+      timeLeft = Math.max(0, GAME_TIME - elapsed);
+      updateHud();
+      if (timeLeft <= 0) endGame(false);
+    }, 1000/15);
+    requestAnimationFrame(loop);
+  }
+  function endGame(cleared){
+    if (!running) return;
+    running = false;
+    clearInterval(timer);
+    timer = null;
+    best = Math.max(best, Math.round(score));
+    localStorage.setItem('captainBellyBest2', String(best));
+    updateHud();
+    overlay.classList.remove('hidden');
+    overlayTitle.innerHTML = cleared ? '救助成功！' : '時間切れ';
+    overlayText.textContent = cleared ? '艦長がfpandaさんを救った！' : 'もう一度助けよう！';
+    resultRow.classList.remove('hidden');
+    resultScore.textContent = Math.round(score);
+    resultBest.textContent = best;
+    mainBtn.textContent = 'もう一回';
+  }
+  function armMetrics(){
+    const rect = stage.getBoundingClientRect();
+    const armW = rect.width * 0.746;
+    const armH = armW * (887/1774);
+    const x = rect.width * (armPos.x/100);
+    const y = rect.height * (armPos.y/100) - armH/2;
+    return {stage:rect, x, y, w:armW, h:armH};
+  }
+  function pointToStage(clientX, clientY){
+    const r = stage.getBoundingClientRect();
+    return {x: clientX - r.left, y: clientY - r.top, w:r.width, h:r.height};
+  }
+  function handPoint(){
+    const m = armMetrics();
+    return {x: m.x + m.w * handHotspot.x, y: m.y + m.h * handHotspot.y, stageW: m.stage.width, stageH: m.stage.height};
+  }
+  function isOnBelly(pt){
+    const cx = pt.stageW * belly.x / 100;
+    const cy = pt.stageH * belly.y / 100;
+    const rx = pt.stageW * belly.rx / 100;
+    const ry = pt.stageH * belly.ry / 100;
+    const dx = (pt.x - cx) / rx;
+    const dy = (pt.y - cy) / ry;
+    return dx*dx + dy*dy <= 1;
+  }
+  function triggerFlash(pt){
+    const now = performance.now();
+    if (now - lastFlash < 70) return;
+    lastFlash = now;
+    flash.style.setProperty('--flash-x', (pt.x/pt.stageW*100)+'%');
+    flash.style.setProperty('--flash-y', (pt.y/pt.stageH*100)+'%');
+    flash.classList.remove('on');
+    void flash.offsetWidth;
+    flash.classList.add('on');
+  }
+  function applyRubbing(dist){
+    const pt = handPoint();
+    warmth.style.setProperty('--warm-x', (pt.x/pt.stageW*100)+'%');
+    warmth.style.setProperty('--warm-y', (pt.y/pt.stageH*100)+'%');
+    if (isOnBelly(pt) && dist > 0.8) {
+      const heal = clamp(dist * 0.085, 0.12, 2.1);
+      pain = Math.max(0, pain - heal);
+      score += Math.round(heal * 12);
+      warmthLevel = clamp(warmthLevel + heal * 0.03, 0, 1);
+      triggerFlash(pt);
+      updateHud();
+      if (pain <= 0) endGame(true);
+    }
+  }
+  function loop(){
+    if (!running) return;
+    warmthLevel = Math.max(0, warmthLevel - 0.02);
+    warmth.style.opacity = String(warmthLevel * 0.95);
+    requestAnimationFrame(loop);
+  }
+  function pointerDown(e){
+    if (!running) return;
+    drag = {id:e.pointerId, startX:e.clientX, startY:e.clientY, startArmX:armPos.x, startArmY:armPos.y, prevX:e.clientX, prevY:e.clientY};
+    arm.classList.add('dragging');
+    arm.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+  }
+  function pointerMove(e){
+    if (!drag || drag.id !== e.pointerId || !running) return;
+    const rect = stage.getBoundingClientRect();
+    const dxPct = (e.clientX - drag.startX) / rect.width * 100;
+    const dyPct = (e.clientY - drag.startY) / rect.height * 100;
+    armPos.x = clamp(drag.startArmX + dxPct, bounds.xMin, bounds.xMax);
+    armPos.y = clamp(drag.startArmY + dyPct, bounds.yMin, bounds.yMax);
+    setArmPos();
+    const mdx = e.clientX - drag.prevX;
+    const mdy = e.clientY - drag.prevY;
+    const dist = Math.hypot(mdx, mdy);
+    drag.prevX = e.clientX;
+    drag.prevY = e.clientY;
+    applyRubbing(dist);
+    e.preventDefault();
+  }
+  function pointerUp(e){
+    if (!drag || drag.id !== e.pointerId) return;
+    arm.classList.remove('dragging');
+    arm.releasePointerCapture?.(e.pointerId);
+    drag = null;
+  }
+  arm.addEventListener('pointerdown', pointerDown);
+  arm.addEventListener('pointermove', pointerMove);
+  arm.addEventListener('pointerup', pointerUp);
+  arm.addEventListener('pointercancel', pointerUp);
+  arm.addEventListener('dragstart', e => e.preventDefault());
+  mainBtn.addEventListener('click', startGame);
+  setArmPos();
+  updateHud();
+})();
+</script>
 </body>
 </html>
