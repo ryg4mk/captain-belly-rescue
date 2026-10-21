@@ -3,65 +3,65 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1,user-scalable=no">
-  <meta name="theme-color" content="#101c2b">
-  <meta name="description" content="白ひげの艦長が、あなたのやさしい指さばきで腹痛を救う60秒のミニゲーム。スマホでもPCでも遊べます。">
+  <meta name="theme-color" content="#111e2d">
+  <meta name="description" content="白ひげの艦長の腕をスティックで動かして、腹痛のfpandaさんを救おう！60秒のやさしいおなか救助ゲーム。">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="艦長！おなかをたすけて！">
-  <meta property="og:description" content="やさしく、ゆっくり、おなかをさすろう。急ぐと逆効果！">
-  <meta property="og:image" content="assets/captain.jpg">
+  <meta property="og:title" content="助けろ艦長！腹痛のfpandaさんを救え！">
+  <meta property="og:description" content="スティックで艦長の腕を操作して、おなかをさすれ！">
+  <meta property="og:image" content="assets/captain-no-hand.webp">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <title>艦長！おなかをたすけて！ | Captain's Belly Rescue</title>
+  <title>助けろ艦長！腹痛のfpandaさんを救え！</title>
   <link rel="stylesheet" href="style.css">
   <script src="game.js" defer></script>
 </head>
 <body>
- <main class="game" id="game" aria-label="艦長のおなかレスキューゲーム">
+ <main class="game" id="game" aria-label="助けろ艦長！腹痛のfpandaさんを救え！">
   <header class="masthead">
    <div class="brandmark" aria-hidden="true">⚓</div>
-   <div class="brandcopy"><p class="eyebrow">CAPTAIN'S BELLY RESCUE</p><h1>艦長！<span>おなかをたすけて！</span></h1></div>
+   <div class="brandcopy"><p class="eyebrow">CAPTAIN'S BELLY RESCUE</p><h1>助けろ艦長！<span>腹痛のfpandaさんを救え！</span></h1></div>
    <button class="iconbtn" id="soundButton" type="button" aria-label="効果音をオン・オフ" aria-pressed="true" title="効果音"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M18 5a9 9 0 0 1 0 14"/></svg></button>
   </header>
-
   <section class="hud" aria-label="ゲームの状態">
    <div class="painpanel">
-    <div class="meterhead"><span><span class="reddot"></span> おなかの痛み</span><strong id="painNum">72<span>%</span></strong></div>
+    <div class="meterhead"><span><span class="reddot"></span> fpandaさんの腹痛</span><strong id="painNum">72<span>%</span></strong></div>
     <div class="paintrack" role="progressbar" aria-label="おなかの痛み" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72" id="painTrack"><div class="painfill" id="painFill"></div></div>
-    <div class="meterhint"><span>よくなった！</span><span>つらい…</span></div>
+    <div class="meterhint"><span>回復！</span><span>痛い…</span></div>
    </div>
-   <div class="statbox"><span class="statlabel">のこり時間</span><div class="statvalue"><span id="timeNum">60</span><small>秒</small></div></div>
+   <div class="statbox"><span class="statlabel">のこり</span><div class="statvalue"><span id="timeNum">60</span><small>秒</small></div></div>
    <div class="statbox scorebox"><span class="statlabel">SCORE</span><div class="statvalue" id="scoreNum">0000</div></div>
   </section>
-
   <section class="playarea">
-   <div class="stageframe" id="stage" aria-label="おなかを指やマウスでなでてください">
-    <img class="photo" src="assets/captain.jpg" alt="白いひげの艦長が男性のおなかに頬と手を寄せて心配している写真" draggable="false">
+   <div class="stageframe" id="stage" aria-label="スティックで艦長の腕を動かして、fpandaさんのおなかをさする">
+    <img class="photo" src="assets/captain-no-hand.webp" alt="白いひげの艦長が腹痛のfpandaさんのおなかに頬を寄せている" draggable="false">
     <div class="photo-shade" aria-hidden="true"></div>
     <div class="photo-warmth" id="photoWarmth" aria-hidden="true"></div>
-    <div class="achelayer" id="acheLayer" aria-hidden="true"></div>
+    <img class="captain-arm" id="captainArm" src="assets/captain-arm.webp" alt="" aria-hidden="true" draggable="false">
     <canvas id="effects" aria-hidden="true"></canvas>
     <div class="floatingmessage" id="floatingMessage" aria-live="polite"></div>
-    <div class="speech" id="speech"><span class="speechmark">艦長</span><span id="speechText">安心しろ、わしがついている。</span></div>
+    <div class="speech" id="speech"><span class="speechmark">艦長</span><span id="speechText">fpandaさん、わしが助けるぞ！</span></div>
     <div class="combo" id="combo" aria-live="off"></div>
-    <div class="stagehint" id="stageHint"><span class="finger">◌</span> 光っている場所を、ゆっくりなでよう</div>
    </div>
-   <div class="belowstage">
-    <div class="instruction"><span class="tinycompass" aria-hidden="true">✧</span><div><strong id="instructionTitle">指を離さず、やさしく動かそう</strong><small id="instructionDetail">赤いモヤに沿って円を描くと、どんどん回復！</small></div></div>
+   <div class="controlbar">
+    <div class="joystickblock">
+     <div class="joystick" id="joystick" aria-label="腕を動かすスティック。上下左右にドラッグ" role="application" tabindex="0">
+       <div class="joycircle"><div class="joyinner" id="joyKnob"><span aria-hidden="true">✥</span></div></div>
+     </div>
+     <div class="controlcopy"><strong>腕を動かす</strong><small id="instructionDetail">スティックをぐるぐる動かしてさすろう</small><span class="controlpc">PC：矢印 / WASD / ゲームパッド</span></div>
+    </div>
     <button class="pausebtn" type="button" id="pauseButton" disabled aria-label="一時停止"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><span>停止</span></button>
    </div>
   </section>
-
-  <footer class="footer"><span>やさしくなでて、腹痛をゼロに。</span><span>BEST <b id="bestNum">0000</b></span></footer>
-
+  <footer class="footer"><span>腕を動かして、腹痛をゼロに。</span><span>BEST <b id="bestNum">0000</b></span></footer>
   <div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
     <section class="dialog" id="dialog">
       <div class="dialog-emblem" id="dialogEmblem">⚓</div>
       <div class="dialog-kicker" id="dialogKicker">CAPTAIN'S SPECIAL MISSION</div>
-      <h2 id="dialogTitle">その腹痛、<br>艦長に任せろ！</h2>
-      <p class="dialog-body" id="dialogBody">おなかに浮かぶ <strong>赤い痛みのモヤ</strong> を、指でそ〜っとなでよう。<br>激しくこすると、かえって痛くなるぞ！</p>
-      <div class="rulechips" id="ruleChips"><span><b>01</b> 赤いモヤを探す</span><span><b>02</b> ゆっくり指を動かす</span><span><b>03</b> 痛みをゼロに</span></div>
+      <h2 id="dialogTitle">助けろ艦長！<br>腹痛のfpandaさんを救え！</h2>
+      <p class="dialog-body" id="dialogBody">画面下の <strong>スティック</strong> で艦長の腕を操作！<br>おなかをゆっくり往復させて、腹痛をやわらげよう。</p>
+      <div class="rulechips" id="ruleChips"><span><b>01</b> スティックを動かす</span><span><b>02</b> おなかをやさしく往復</span><span><b>03</b> 60秒以内に回復</span></div>
       <div class="resultstats" id="resultStats" hidden></div>
       <button class="startbtn" id="mainButton" type="button">救助をはじめる <span>→</span></button>
-      <p class="dialog-foot" id="dialogFoot">60秒で痛みをゼロにできたら成功！</p>
+      <p class="dialog-foot" id="dialogFoot">PCでは矢印・WASD・ゲームパッドにも対応！</p>
     </section>
   </div>
  </main>

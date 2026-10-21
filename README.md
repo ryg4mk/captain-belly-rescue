@@ -1,25 +1,26 @@
-# 艦長！おなかをたすけて！ / Captain's Belly Rescue
+# 助けろ艦長！腹痛のfpandaさんを救え！
 
-白ひげの艦長が腹痛を助ける、指でなでる60秒間のブラウザゲームです。提供されたオリジナル画像を使用しています。
+GitHub Pages に対応した、艦長の腕を操作して腹痛のfpandaさんを助ける無料ブラウザゲームです。
 
-## 遊び方
-1. 「救助をはじめる」を押します。
-2. おなかに現れる赤いモヤの上を、指（PCならマウス）で押したまま、ゆっくり動かします。止めたままでは回復しません。
-3. 痛みを 0 にしたら成功。60秒を超えるか痛みが100%になると失敗です。
-4. 速すぎる動きは痛みを増やします。スコアとベスト記録はブラウザのローカル保存です。
+## 操作
 
-## GitHub Pages公開
-GitHubで**公開（Public）リポジトリ**を新規作成し、このフォルダのファイルを**フォルダの中身ごとリポジトリ直下**へアップロードしてください。
-`index.html`, `style.css`, `game.js`, `favicon.svg`, `assets/captain.jpg` が同じ相対構成になるようにします。
+- スマホ・タブレット：画面下のスティックをドラッグして艦長の手を動かす
+- PC：スティックをマウスドラッグ、または WASD / 矢印キー
+- ゲームパッド：左スティックまたは方向キー
+- 停止ボタン、Esc または Space：一時停止
 
-Repository **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main, Folder: /(root) → Save**。
-数分後に `https://<GitHubユーザー名>.github.io/<リポジトリ名>/` で遊べます。
+おなかの上で艦長の手を動かし続けると腹痛が軽減。60 秒以内に腹痛 0％にできれば勝利です。停止していると腹痛が徐々に強くなります。スコアとベスト記録はブラウザに保存されます。腹痛の位置を示すガイドはありません。
 
-すでにPages公開中の `ryg4mk.github.io` リポジトリに `captain-belly-rescue/` フォルダとして配置した場合は、`https://ryg4mk.github.io/captain-belly-rescue/` です。独立リポジトリにするときはリポジトリ名を `captain-belly-rescue` にするのがおすすめです。
+## 素材
+- `assets/captain-no-hand.webp`：手を除去した背景写真
+- `assets/captain-arm.webp`：艦長の制服を着た長い腕（透過 WebP）
 
-## 技術・権利
-- HTML / CSS / Vanilla JavaScript、フレームワーク不要、外部API不要
-- 画像は `assets/captain.jpg`。添付画像を使用
-- オフライン動作可能（外部フォント・ライブラリ不使用）
-- タッチ、マウス、サウンドON/OFF、Pause、ベストスコア保存に対応
-- サーバーや課金機能不要、静的ページとして配信可能
+元の画像から制作した素材を別レイヤーで配置し、腕だけを動かしています。素材を差し替える際は縦横比・手の位置に注意してください。
+
+## GitHub Pages 公開
+
+このフォルダのファイルをリポジトリ直下に置き、Settings → Pages → Build and deployment → Deploy from a branch → `main` / `(root)` を選択します。
+
+公開 URL： https://ryg4mk.github.io/captain-belly-rescue/
+
+外部 CDN / サーバー / ビルド環境は不要です。HTML・CSS・JavaScript だけで動作します。
